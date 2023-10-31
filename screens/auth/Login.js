@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#F3EFEF'
     },
     passwordInput: {
-        marginTop: 10 // Add some spacing between email and password fields
+        marginTop: 10
     }
 });
 

@@ -1,66 +1,24 @@
-// import React, { useEffect, useState } from 'react';
-// import { View, Text } from 'react-native';
-// import { doc, getDoc } from 'firebase/firestore';
-// import { firestore } from '../../firebaseConfig';
+import React, { useState, useEffect } from 'react'
+import { View, Text, FlatList, StyleSheet, Modal, Button } from 'react-native'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import { getDocs, collection } from 'firebase/firestore';
 
-// const Home = ({ route }) => {
-//     const { user } = route.params;
-//     const [userData, setUserData] = useState(null);
+import { auth, firestore } from '../../firebaseConfig';
 
-//     useEffect(() => {
-//         const fetchUserData = async () => {
-//             try {
-//                 const userDocRef = doc(firestore, 'users', user.uid);
-//                 const userDocSnapshot = await getDoc(userDocRef);
-//                 if (userDocSnapshot.exists()) {
-//                     setUserData(userDocSnapshot.data());
-//                 } else {
-//                     console.log('User data not found in Firestore');
-//                 }
-//             } catch (error) {
-//                 console.error('Error fetching user data:', error);
-//             }
-//         };
+import ModalView from '../../components/ModalView'
 
-//         fetchUserData();
+import globalStyles from '../../utils/globalStyles'
+import BlogCard from '../../components/BlogCard'
 
-//         return () => {
-//             // Cleanup if necessary
-//         };
-//     }, [user]);
+const Home = ({ navigation }) => {
 
-//     return (
-//         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-//             {userData ? (
-//                 <>
-//                     <Text>Welcome, {userData.name}</Text>
-//                     <Text>Email: {user.email}</Text>
-//                 </>
-//             ) : (
-//                 <Text>Loading user data...</Text>
-//             )}
-//         </View>
-//     );
-// };
-
-// export default Home;
-import React, { useEffect, useState } from 'react';
-import { Image, Text, Button, TextInput, StyleSheet, TouchableOpacity, View, Modal } from 'react-native';
-import globalStyles from '../../utils/globalStyles';
-import * as ImagePicker from 'expo-image-picker';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth, firestore, firebase } from '../../firebaseConfig';
-import { doc, setDoc } from 'firebase/firestore';
-
-
-const Home = () => {
     const [blogs, setBlogs] = useState([])
     const [modalOpen, setModalOpen] = useState(false)
     const [selectedCardId, setSelectedCardId] = useState([])
+
     const getBlogData = async () => {
         try {
-            const querySnapshot = await getDocs(collection(firestore, 'usersBlog', auth().currentUser.uid, 'blogs'));
+            const querySnapshot = await getDocs(collection(firestore, 'usersBlog', auth.currentUser.uid, 'blogs'));
             const data = [];
             querySnapshot.forEach((doc) => {
                 data.push({
@@ -69,13 +27,57 @@ const Home = () => {
                 });
             });
             setBlogs(data);
+            console.log("data from firebase", data)
         } catch (error) {
             console.error('Error fetching blog data:', error);
         }
     };
+
     useEffect(() => {
         getBlogData()
     }, [])
+
+    function renderItem({ item }) {
+        return (
+            <BlogCard
+                blogData={item}
+                moveToBlogScreen={moveToBlogScreen}
+                onModalOpen={onModalOpen}
+            />
+        )
+    }
+
+    function onModalOpen(cardId) {
+        setModalOpen(true)
+        setSelectedCardId(cardId)
+    }
+    function onCloseModal() {
+        setModalOpen(false)
+        setSelectedCardId(null)
+    }
+
+    function moveToBlogScreen(blogData) {
+        navigation.navigate('Blog', {
+            blogData
+        })
+    }
+
+    function onUpdateBlog() {
+        navigation.navigate('CreateBlog', { id: selectedCardId })
+        setSelectedCardId(null)
+        setModalOpen(false)
+    }
+    function onDeleteBlog() {
+        setModalOpen(false)
+        firestore().collection('usersBlog')
+            .doc(auth().currentUser.uid)
+            .collection('blogs')
+            .doc(selectedCardId)
+            .delete()
+            .catch((error) => console.log(error))
+        setSelectedCardId(null)
+    }
+
     return (
         <View style={globalStyles.primaryContainer}>
             <Modal
@@ -83,20 +85,37 @@ const Home = () => {
                 animationType='fade'
                 transparent={true}
             >
-                {/* <ModalView>
-
-                </ModalView> */}
-
+                <ModalView
+                    onPressHandlers={{
+                        onUpdateBlog,
+                        onDeleteBlog,
+                        onCloseModal
+                    }}
+                    onCloseModal={onCloseModal}
+                />
             </Modal>
             <View style={styles.header}>
                 <Text style={globalStyles.headingText}>My Blogs</Text>
             </View>
             <View style={styles.addIcon}>
-                <Icon name="plus" size={25} color="white" />
+                <Ionicons
+                    name='add-circle-sharp'
+                    size={54}
+                    color='black'
+                    onPress={() => navigation.navigate('CreateBlog')}
+                />
+            </View>
+
+            <View style={{ alignItems: 'center' }}>
+                <FlatList
+                    data={blogs}
+                    keyExtractor={(item) => item.id}
+                    renderItem={renderItem}
+                />
             </View>
         </View>
-    );
-};
+    )
+}
 
 const styles = StyleSheet.create({
     header: {
@@ -109,14 +128,7 @@ const styles = StyleSheet.create({
         left: '45%',
         zIndex: 1,
         elevation: 20,
-        borderRadius: 30,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'black',
-        width: 60,
-        height: 60
-    },
-
+    }
 })
 
 export default Home;

@@ -36,12 +36,12 @@ const globalStyles = StyleSheet.create({
         },
         shadowOpacity: 0.5,
         elevation: 5,
-        backgroundColor: 'purple'
+        backgroundColor: 'purple',
     },
     btnText: {
         fontFamily: 'Nunito-SemiBold',
         fontSize: 18,
-        color: 'white',
+        color: 'black',
         textAlign: 'center'
     },
     largeBtnText: {
@@ -49,6 +49,12 @@ const globalStyles = StyleSheet.create({
         fontSize: 22,
         color: 'white',
         textAlign: 'center'
+    },
+    deleteBtn: {
+        backgroundColor: 'blue',
+    },
+    deleteText: {
+        color: 'white'
     }
 })
 export default globalStyles;
