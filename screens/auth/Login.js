@@ -20,7 +20,6 @@ const Login = (props) => {
             // Reset email and password fields after successful login
             setEmail('');
             setPassword('');
-            props.navigation.navigate('Home');
 
         } catch (error) {
             console.error(error);

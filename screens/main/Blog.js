@@ -1,10 +1,10 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, Text } from 'react-native';
 
 const Blog = () => {
     return (
         <View>
-
+            <Text>Blog</Text>
         </View>
     );
 };

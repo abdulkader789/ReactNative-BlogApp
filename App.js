@@ -8,7 +8,7 @@ import Login from './screens/auth/Login'
 import Register from './screens/auth/Register';
 import Blog from './screens/main/Blog';
 import Home from './screens/main/Home';
-import createBlog from './screens/main/createBlog';
+import CreateBlog from './screens/main/CreateBlog';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { auth } from './firebaseConfig'; // Import your Firebase authentication object
 
@@ -44,7 +44,6 @@ const App = () => {
           <Tab.Navigator initialRouteName='Login'>
             <Tab.Screen name="Login" component={Login} />
             <Tab.Screen name="Register" component={Register} />
-
           </Tab.Navigator>
         </NavigationContainer>
       </SafeAreaView>
@@ -52,12 +51,13 @@ const App = () => {
   }
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName={user ? 'Home' : 'Login'}>
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Home" component={Home} initialParams={{ user: user }} />
-
+      <Stack.Navigator initialRouteName='Login'>
+        <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="createBlog" component={CreateBlog} />
+        <Stack.Screen name="Blog" component={Blog} />
       </Stack.Navigator>
     </NavigationContainer>
+
   );
 }
 

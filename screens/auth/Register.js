@@ -4,9 +4,8 @@ import globalStyles from '../../utils/globalStyles';
 import * as ImagePicker from 'expo-image-picker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth, firestore, storage, firebase } from '../../firebaseConfig';
+import { auth, firestore, firebase } from '../../firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
-import { ref } from 'firebase/storage';
 
 import * as FileSystem from 'expo-file-system';
 
@@ -114,7 +113,7 @@ const Register = (props) => {
             setPassword('');
             setDisplayPicture(null);
             setImagePicked(false);
-            props.navigation.navigate('Login');
+            // props.navigation.navigate('Login');
 
         } catch (error) {
             console.error(error);
