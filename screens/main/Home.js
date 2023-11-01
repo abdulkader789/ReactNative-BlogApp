@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Modal, Button } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ScrollView, Modal, Button } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { getDocs, collection } from 'firebase/firestore';
 
@@ -78,7 +78,7 @@ const Home = ({ navigation }) => {
     }
 
     return (
-        <View style={globalStyles.primaryContainer}>
+        <ScrollView style={globalStyles.primaryContainer}>
             <Modal
                 visible={modalOpen}
                 animationType='fade'
@@ -101,6 +101,7 @@ const Home = ({ navigation }) => {
                     name='add-circle-sharp'
                     size={54}
                     color='black'
+
                     onPress={() => navigation.navigate('CreateBlog')}
                 />
             </View>
@@ -112,7 +113,7 @@ const Home = ({ navigation }) => {
                     renderItem={renderItem}
                 />
             </View>
-        </View>
+        </ScrollView>
     );
 };
 
@@ -123,10 +124,8 @@ const styles = StyleSheet.create({
     },
     addIcon: {
         position: 'absolute',
-        bottom: 20,
-        left: '45%',
         zIndex: 1,
-        elevation: 20,
+        right: 30,
     }
 });
 

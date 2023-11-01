@@ -53,6 +53,9 @@ const globalStyles = StyleSheet.create({
         backgroundColor: 'green',
 
     },
+    uploadBtn: {
+        backgroundColor: 'purple'
+    },
 
     deleteBtn: {
         backgroundColor: 'red',

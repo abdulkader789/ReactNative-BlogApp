@@ -174,7 +174,7 @@ const CreateBlog = ({ navigation, route }) => {
             </View>
             <View style={{ flexDirection: 'row', margin: 20 }}>
                 <Image style={styles.image} source={{ uri: coverImg }} resizeMode="cover" />
-                <TouchableOpacity style={styles.touchabelBtn} onPress={onUploadImage}>
+                <TouchableOpacity style={[styles.touchabelBtn, globalStyles.uploadBtn]} onPress={onUploadImage}>
                     <Text style={globalStyles.btnText}>Upload Cover Image</Text>
                 </TouchableOpacity>
             </View>
