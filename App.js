@@ -53,7 +53,7 @@ const App = () => {
     <NavigationContainer>
       <Stack.Navigator initialRouteName='Login'>
         <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="createBlog" component={CreateBlog} />
+        <Stack.Screen name="CreateBlog" component={CreateBlog} />
         <Stack.Screen name="Blog" component={Blog} />
       </Stack.Navigator>
     </NavigationContainer>

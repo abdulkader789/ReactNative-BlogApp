@@ -1,20 +1,19 @@
-import React, { useState, useEffect } from 'react'
-import { View, Text, FlatList, StyleSheet, Modal, Button } from 'react-native'
-import Ionicons from 'react-native-vector-icons/Ionicons'
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, StyleSheet, Modal, Button } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { getDocs, collection } from 'firebase/firestore';
 
 import { auth, firestore } from '../../firebaseConfig';
 
-import ModalView from '../../components/ModalView'
+import ModalView from '../../components/ModalView';
 
-import globalStyles from '../../utils/globalStyles'
-import BlogCard from '../../components/BlogCard'
+import globalStyles from '../../utils/globalStyles';
+import BlogCard from '../../components/BlogCard';
 
 const Home = ({ navigation }) => {
-
-    const [blogs, setBlogs] = useState([])
-    const [modalOpen, setModalOpen] = useState(false)
-    const [selectedCardId, setSelectedCardId] = useState([])
+    const [blogs, setBlogs] = useState([]);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [selectedCardId, setSelectedCardId] = useState([]);
 
     const getBlogData = async () => {
         try {
@@ -27,15 +26,15 @@ const Home = ({ navigation }) => {
                 });
             });
             setBlogs(data);
-            console.log("data from firebase", data)
+            console.log("data from firebase", data);
         } catch (error) {
             console.error('Error fetching blog data:', error);
         }
     };
 
     useEffect(() => {
-        getBlogData()
-    }, [])
+        getBlogData();
+    }, []);
 
     function renderItem({ item }) {
         return (
@@ -44,38 +43,38 @@ const Home = ({ navigation }) => {
                 moveToBlogScreen={moveToBlogScreen}
                 onModalOpen={onModalOpen}
             />
-        )
+        );
     }
 
     function onModalOpen(cardId) {
-        setModalOpen(true)
-        setSelectedCardId(cardId)
+        setModalOpen(true);
+        setSelectedCardId(cardId);
     }
     function onCloseModal() {
-        setModalOpen(false)
-        setSelectedCardId(null)
+        setModalOpen(false);
+        setSelectedCardId(null);
     }
 
     function moveToBlogScreen(blogData) {
         navigation.navigate('Blog', {
             blogData
-        })
+        });
     }
 
     function onUpdateBlog() {
-        navigation.navigate('CreateBlog', { id: selectedCardId })
-        setSelectedCardId(null)
-        setModalOpen(false)
+        navigation.navigate('CreateBlog', { id: selectedCardId });
+        setSelectedCardId(null);
+        setModalOpen(false);
     }
     function onDeleteBlog() {
-        setModalOpen(false)
-        firestore().collection('usersBlog')
-            .doc(auth().currentUser.uid)
+        setModalOpen(false);
+        firestore.collection('usersBlog')
+            .doc(auth.currentUser.uid)
             .collection('blogs')
             .doc(selectedCardId)
             .delete()
-            .catch((error) => console.log(error))
-        setSelectedCardId(null)
+            .catch((error) => console.log(error));
+        setSelectedCardId(null);
     }
 
     return (
@@ -114,8 +113,8 @@ const Home = ({ navigation }) => {
                 />
             </View>
         </View>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     header: {
@@ -129,6 +128,6 @@ const styles = StyleSheet.create({
         zIndex: 1,
         elevation: 20,
     }
-})
+});
 
 export default Home;

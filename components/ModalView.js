@@ -2,39 +2,44 @@ import React from 'react'
 import { View, Text, Button, TouchableOpacity, StyleSheet } from 'react-native'
 
 import globalStyles from '../utils/globalStyles'
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 
 const ModalView = ({ onPressHandlers }) => {
 
-    const {
-        onUpdateBlog,
-        onDeleteBlog,
-        onCloseModal
-    } = onPressHandlers
+    const { onUpdateBlog, onDeleteBlog, onCloseModal } = onPressHandlers
 
     return (
         <View style={styles.container}>
             <View style={styles.modalViewContainer}>
                 <TouchableOpacity
-                    style={styles.touchableBtn}
+                    style={[styles.touchableBtn, globalStyles.updateBtn]}
                     onPress={onUpdateBlog}
+
                 >
                     <Text style={globalStyles.btnText}>Update</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    style={styles.touchableBtn}
+                    style={[styles.touchableBtn, globalStyles.deleteBtn]}
                     onPress={onDeleteBlog}
                 >
                     <Text style={globalStyles.btnText}>Delete</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={[styles.touchableBtn, globalStyles.deleteBtn,]}
+                <Icon
+                    name="close"
+                    size={32}
                     onPress={() => onCloseModal()}
-                >
-                    <Text style={[globalStyles.deleteText, globalStyles.btnText]}>Cancel</Text>
-                </TouchableOpacity>
+
+                    style={{
+                        position: 'absolute',
+                        top: 10,
+                        right: 10,
+                        zIndex: 1,
+                    }}
+                />
+
             </View>
         </View>
     )
@@ -48,14 +53,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     touchableBtn: {
-        padding: 10,
-        backgroundColor: 'lightgray',
-        borderRadius: 7,
-        shadowColor: 'gray',
-        shadowOffset: {
-            width: 1,
-            height: 2
-        },
+        ...globalStyles.primaryTouchableBtn,
         width: '80%',
         alignSelf: 'center',
         marginVertical: 5

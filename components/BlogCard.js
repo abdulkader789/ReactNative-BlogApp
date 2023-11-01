@@ -1,8 +1,7 @@
 import React from 'react'
 import { View, TouchableOpacity, StyleSheet, TouchableWithoutFeedback, Dimensions, Image, Text } from 'react-native'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-
-
+import globalStyles from '../utils/globalStyles'
 
 const BlogCard = ({ blogData, onModalOpen, moveToBlogScreen }) => {
 
@@ -61,8 +60,7 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 15,
     },
     cardTitle: {
-        fontSize: 22,
-        fontFamily: 'Nunito-Bold',
+        ...globalStyles.primaryText,
         color: 'white',
         padding: 10,
         fontSize: 26,

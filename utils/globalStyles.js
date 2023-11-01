@@ -36,12 +36,11 @@ const globalStyles = StyleSheet.create({
         },
         shadowOpacity: 0.5,
         elevation: 5,
-        backgroundColor: 'purple',
     },
     btnText: {
         fontFamily: 'Nunito-SemiBold',
         fontSize: 18,
-        color: 'black',
+        color: 'white',
         textAlign: 'center'
     },
     largeBtnText: {
@@ -50,11 +49,18 @@ const globalStyles = StyleSheet.create({
         color: 'white',
         textAlign: 'center'
     },
-    deleteBtn: {
-        backgroundColor: 'blue',
+    updateBtn: {
+        backgroundColor: 'green',
+
     },
-    deleteText: {
-        color: 'white'
-    }
+
+    deleteBtn: {
+        backgroundColor: 'red',
+    },
+
+    cancelBtn: {
+        backgroundColor: 'blue', // Change the background color for cancel button
+    },
+
 })
 export default globalStyles;
