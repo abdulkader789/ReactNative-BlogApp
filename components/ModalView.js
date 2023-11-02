@@ -1,8 +1,7 @@
 import React from 'react'
-import { View, Text, Button, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 
 import globalStyles from '../utils/globalStyles'
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
 
 const ModalView = ({ onPressHandlers }) => {
@@ -27,22 +26,18 @@ const ModalView = ({ onPressHandlers }) => {
                     <Text style={globalStyles.btnText}>Delete</Text>
                 </TouchableOpacity>
 
-                <Ionicons
-                    name="close"
-                    size={30}
-                    onPress={() => onCloseModal()}
+                <TouchableOpacity style={{
+                    position: 'absolute',
+                    top: 10,
+                    right: 20,
+                    zIndex: 1,
 
-                    style={{
-                        position: 'absolute',
-                        top: 5,
-                        right: 5,
-                        zIndex: 1,
-                        borderWidth: 1,
-                        borderRadius: 30,
-                        paddingHorizontal: 2,
 
-                    }}
-                />
+                }} onPress={() => onCloseModal()}>
+
+
+                    <Text style={{ fontSize: 18 }}>Close</Text>
+                </TouchableOpacity>
 
             </View>
         </View>

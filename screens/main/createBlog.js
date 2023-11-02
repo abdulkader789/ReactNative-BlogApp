@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, TextInput, Button, StyleSheet, ScrollView } from 'react-native';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { View, Text, Image, TouchableOpacity, TextInput, StyleSheet, ScrollView } from 'react-native';
+import { addDoc, collection, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import globalStyles from '../../utils/globalStyles';
 import { auth, firestore, firebase } from '../../firebaseConfig';
 import * as ImagePicker from 'expo-image-picker';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-const CreateBlog = ({ navigation, route }) => {
+
+const CreateBlog = ({ navigation, route, onUpdateSuccess }) => {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [coverImg, setCoverImg] = useState(null);
@@ -18,9 +19,25 @@ const CreateBlog = ({ navigation, route }) => {
 
     useEffect(() => {
         if (id && uid) {
-            getBlogData(id);
+            const blogDocRef = doc(collection(firestore, 'usersBlog', uid, 'blogs'), id);
+            const unsubscribe = onSnapshot(blogDocRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.data();
+                    setTitle(data.title);
+                    setContent(data.content);
+                    setCoverImg(data.coverImage);
+                }
+            });
+
+            // Clean up the listener when the component unmounts
+            return () => {
+                unsubscribe();
+            };
         }
     }, [id, uid]);
+
+
+
     const onUploadImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -29,10 +46,12 @@ const CreateBlog = ({ navigation, route }) => {
             quality: 1,
         });
 
-        if (!result.canceled) {
-            setBlogImage(result.uri);
+        if (!result.canceled && result.assets.length > 0) {
+            const selectedAsset = result.assets[0];
+            setCoverImg(selectedAsset.uri);
         }
-    }
+    };
+
 
 
 
@@ -44,9 +63,17 @@ const CreateBlog = ({ navigation, route }) => {
         }
         onCreate();
     }
+
+    useEffect(() => {
+        if (id && uid) {
+            getBlogData(id);
+        }
+    }, [id, uid]);
+
+
     function getBlogData(id) {
         const blogDocRef = doc(collection(firestore, 'usersBlog', uid, 'blogs'), id);
-        getDoc(blogDocRef).then((snapshot) => {
+        const unsubscribe = onSnapshot(blogDocRef, (snapshot) => {
             if (snapshot.exists()) {
                 const data = snapshot.data();
                 setTitle(data.title);
@@ -54,81 +81,87 @@ const CreateBlog = ({ navigation, route }) => {
                 setCoverImg(data.coverImage);
             }
         });
+
+        // Return the unsubscribe function
+        return unsubscribe;
     }
 
 
-    const upladCoverImg = async (uid) => {
 
+
+    const uploadCover = async (uid) => {
         try {
-
             if (coverImg) {
-                try {
-                    const { uri } = await FileSystem.getInfoAsync(coverImg)
-                    const blob = await new Promise((resolve, reject) => {
-                        const xhr = new XMLHttpRequest();
-                        xhr.onload = () => {
-                            resolve(xhr.response)
-                        }
-                        xhr.onerror = (e) => {
-                            reject(new TypeError('Network request failed'))
-                        }
-                        xhr.responseType = 'blob';
-                        xhr.open('GET', uri, true)
-                        xhr.send(null)
-                    })
-                    const filename = coverImg.substring(coverImg.lastIndexOf('/') + 1)
-                    const ref = firebase.storage().ref().child(filename)
-                    await ref.put(blob)
-                    // Get the download URL of the uploaded image
-                    imageUrl = await ref.getDownloadURL();
+                const response = await fetch(coverImg);
+                const blob = await response.blob();
+                const filename = coverImg.substring(coverImg.lastIndexOf('/') + 1);
+                const ref = firebase.storage().ref().child(`images/${filename}`);
+                await ref.put(blob);
+                // Get the download URL of the uploaded image
+                const downloadURL = await ref.getDownloadURL();
+                console.log('url from firsebase: ', downloadURL)
 
-                } catch (e) {
-                    console.log(e)
-                }
-
+                return downloadURL;
             }
-        } catch (e) {
-            console.log(e)
+        } catch (error) {
+            console.error(error);
         }
-    }
+    };
+
+
+
 
 
     const onCreate = async () => {
-        if (!title && !content) {
-            return false;
+        if (!title || !content) {
+            console.log('Title and content are required.');
+            return;
         }
-        navigation.navigate('Home');
 
+        const downloadURL = await uploadCover(uid);
 
-        try {
-            const docRef = await addDoc(collection(firestore, 'usersBlog', uid, 'blogs'), {
-                title,
-                content,
-                coverImage: downloadURL,
-                createdAt: serverTimestamp(),
-            });
+        if (downloadURL) {
+            try {
+                await addDoc(collection(firestore, 'usersBlog', uid, 'blogs'), {
+                    title,
+                    content,
+                    coverImage: downloadURL,
+                    createdAt: serverTimestamp(),
+                });
 
-            // Clear form fields after creating the blog
-            setTitle('');
-            setContent('');
-            setCoverImg(null);
-        } catch (error) {
-            console.log(error);
+                // Clear form fields after creating the blog
+                setTitle('');
+                setContent('');
+                setCoverImg(null);
+                console.warn('succefully uploaded blog data')
+                onUpdateSuccess();
+
+                navigation.navigate('Home');
+            } catch (error) {
+                console.error(error);
+            }
+        } else {
+            console.log('Failed to upload the cover image.');
         }
-    }
+    };
 
 
+
+
+    // ... rest of your code
 
     const onUpdate = async (id) => {
-        navigation.navigate('Home');
         try {
-            let downloadURL = oldCoverImageURL;
+            let downloadURL = coverImg; // Default to the new cover image URL
 
-            if (oldCoverImageURL !== coverImg) {
-                // Use storage.put method for uploading the image to Firebase Storage
-                const storageRef = ref(storage, 'images/' + id); // Update the path as needed
-                await uploadBytes(storageRef, coverImgBlob); // Make sure coverImgBlob is a Blob or Uint8Array containing the image data
-                downloadURL = await getDownloadURL(storageRef);
+            if (coverImg) {
+                const storageRef = firebase.storage().ref().child(`images/${id}`);
+                const response = await fetch(coverImg);
+                const blob = await response.blob();
+                await storageRef.put(blob); // Upload the image directly to the storage reference
+
+                // Get the download URL of the uploaded image
+                downloadURL = await storageRef.getDownloadURL();
             }
 
             // Update the document in Firestore
@@ -139,10 +172,18 @@ const CreateBlog = ({ navigation, route }) => {
                 coverImage: downloadURL,
                 lastUpdate: serverTimestamp(),
             });
+            getBlogData(id)
+            console.warn("you updated your blog")
+            onUpdateSuccess();
+
+            navigation.navigate('Home');
+
         } catch (error) {
             console.error(error);
         }
     };
+
+
 
 
     return (
@@ -172,23 +213,24 @@ const CreateBlog = ({ navigation, route }) => {
                     underlineColorAndroid="transparent"
                 />
             </View>
-            <View style={{ flexDirection: 'row', margin: 20 }}>
+            <View>
                 <Image style={styles.image} source={{ uri: coverImg }} resizeMode="cover" />
-                <TouchableOpacity style={[styles.touchabelBtn, globalStyles.uploadBtn]} onPress={onUploadImage}>
-                    <Text style={globalStyles.btnText}>Upload Cover Image</Text>
+                <TouchableOpacity onPress={onUploadImage}>
+                    <Text style={styles.pickImageText}>Pick Cover Image
+                    </Text>
                 </TouchableOpacity>
             </View>
-            <FontAwesome
-                name="check-circle"
-                color="purple"
-                size={44}
-                style={styles.uploadBtn}
-                onPress={onCheck}
-            />
+
+            <View style={styles.uploadContainer}>
+                <TouchableOpacity style={[styles.touchabelBtn, globalStyles.uploadBtn]} onPress={onCheck}>
+                    <Text style={globalStyles.btnText}>Upload Blog</Text>
+                </TouchableOpacity>
+            </View>
+
+
         </ScrollView>
     );
 };
-
 const styles = StyleSheet.create({
     input: {
         borderWidth: 1,
@@ -203,7 +245,6 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 18,
         margin: 10,
-        fontFamily: 'Nunito-Regular',
     },
     touchabelBtn: {
         ...globalStyles.primaryTouchableBtn,
@@ -227,6 +268,15 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.5,
         elevation: 10,
     },
-});
+    pickImageText: {
+        color: 'blue',
+        textAlign: 'center'
+    },
+    uploadContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 20
+    }
 
+})
 export default CreateBlog;

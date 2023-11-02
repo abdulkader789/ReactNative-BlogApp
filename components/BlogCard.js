@@ -1,6 +1,5 @@
 import React from 'react'
 import { View, TouchableOpacity, StyleSheet, TouchableWithoutFeedback, Dimensions, Image, Text } from 'react-native'
-import Ionicons from 'react-native-vector-icons/Ionicons'
 import globalStyles from '../utils/globalStyles'
 
 const BlogCard = ({ blogData, onModalOpen, moveToBlogScreen }) => {
@@ -12,19 +11,18 @@ const BlogCard = ({ blogData, onModalOpen, moveToBlogScreen }) => {
             style={styles.container}
             onPress={() => moveToBlogScreen(blogData)}
         >
-            <TouchableWithoutFeedback>
-                <Ionicons
-                    name='ios-ellipsis-vertical-circle'
-                    size={32}
-                    color='white'
-                    style={{
-                        position: 'absolute',
-                        top: 10,
-                        right: 10,
-                        zIndex: 1,
-                    }}
-                    onPress={() => onModalOpen(blogData.id)}
-                />
+            <TouchableWithoutFeedback onPress={() => onModalOpen(blogData.id)}>
+
+                <Text style={{
+                    position: 'absolute',
+                    top: 10,
+                    right: 10,
+                    zIndex: 1,
+                    color: 'black',
+                    backgroundColor: 'white',
+                    padding: 10,
+                    borderRadius: 5
+                }}>Options</Text>
             </TouchableWithoutFeedback>
 
             <View style={styles.card}>

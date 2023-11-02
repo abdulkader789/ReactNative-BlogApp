@@ -1,50 +1,68 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, ScrollView, Modal, Button } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, Text, FlatList, StyleSheet, ScrollView, Modal, Button, TouchableOpacity } from 'react-native';
+// import Ionicons from 'react-native-vector-icons/Ionicons';
 import { getDocs, collection } from 'firebase/firestore';
+// import { Ionicons } from '@expo/vector-icons';
+import { doc, deleteDoc } from 'firebase/firestore';
 
-import { auth, firestore } from '../../firebaseConfig';
+import { auth, firestore, firebase } from '../../firebaseConfig';
+import { getAuth, signOut } from 'firebase/auth';
 
 import ModalView from '../../components/ModalView';
 
 import globalStyles from '../../utils/globalStyles';
 import BlogCard from '../../components/BlogCard';
+import { UserContext } from '../../components/UserContext';
 
 const Home = ({ navigation }) => {
     const [blogs, setBlogs] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedCardId, setSelectedCardId] = useState([]);
+    const { setLoggedIn } = useContext(UserContext);
+    const onUpdateSuccess = () => {
+        // Call the function to update the data in the homepage
+        getBlogData();
+    };
+    const onLogout = async () => {
+        const auth = getAuth();
+        try {
+            await signOut(auth);
+            setLoggedIn(false);
+        } catch (error) {
+            console.error('Error signing out:', error);
+        }
+
+    };
 
     const getBlogData = async () => {
         try {
-            const querySnapshot = await getDocs(collection(firestore, 'usersBlog', auth.currentUser.uid, 'blogs'));
-            const data = [];
-            querySnapshot.forEach((doc) => {
-                data.push({
-                    id: doc.id,
-                    ...doc.data(),
+            const user = auth.currentUser;
+            if (user) {
+                const querySnapshot = await getDocs(collection(firestore, 'usersBlog', user.uid, 'blogs'));
+                const data = [];
+                querySnapshot.forEach((doc) => {
+                    data.push({
+                        id: doc.id,
+                        ...doc.data(),
+                    });
                 });
-            });
-            setBlogs(data);
-            console.log("data from firebase", data);
+                setBlogs(data);
+                console.log("data from firebase", data);
+            } else {
+                console.log("User not authenticated");
+                // Handle the case where the user is not authenticated
+            }
         } catch (error) {
             console.error('Error fetching blog data:', error);
         }
     };
 
+
     useEffect(() => {
         getBlogData();
     }, []);
 
-    function renderItem({ item }) {
-        return (
-            <BlogCard
-                blogData={item}
-                moveToBlogScreen={moveToBlogScreen}
-                onModalOpen={onModalOpen}
-            />
-        );
-    }
+
 
     function onModalOpen(cardId) {
         setModalOpen(true);
@@ -65,15 +83,21 @@ const Home = ({ navigation }) => {
         navigation.navigate('CreateBlog', { id: selectedCardId });
         setSelectedCardId(null);
         setModalOpen(false);
+        getBlogData();
     }
     function onDeleteBlog() {
         setModalOpen(false);
-        firestore.collection('usersBlog')
-            .doc(auth.currentUser.uid)
-            .collection('blogs')
-            .doc(selectedCardId)
-            .delete()
-            .catch((error) => console.log(error));
+        const blogRef = doc(firestore, 'usersBlog', auth.currentUser.uid, 'blogs', selectedCardId);
+
+        deleteDoc(blogRef)
+            .then(() => {
+                console.warn('Document successfully deleted!');
+                getBlogData()
+            })
+            .catch((error) => {
+                console.error('Error deleting document: ', error);
+            });
+
         setSelectedCardId(null);
     }
 
@@ -93,25 +117,39 @@ const Home = ({ navigation }) => {
                     onCloseModal={onCloseModal}
                 />
             </Modal>
+            <View style={styles.headerBtnContainer}>
+                {/* <TouchableOpacity style={styles.createBtn} onPress={() => navigation.navigate('CreateBlog')}
+                >
+                    <Text style={styles.createText}>Create Blog</Text>
+
+                </TouchableOpacity> */}
+
+                <TouchableOpacity style={styles.createBtn} onPress={() => navigation.navigate('CreateBlog', { onUpdateSuccess })}>
+                    <Text style={styles.createText}>Create Blog</Text>
+                </TouchableOpacity>
+
+
+                <TouchableOpacity style={styles.logoutBtn} onPress={onLogout}>
+                    <Text style={styles.logoutText}>Logout</Text>
+                </TouchableOpacity>
+            </View>
             <View style={styles.header}>
                 <Text style={globalStyles.headingText}>My Blogs</Text>
             </View>
-            <View style={styles.addIcon}>
-                <Ionicons
-                    name='add-circle-sharp'
-                    size={54}
-                    color='black'
 
-                    onPress={() => navigation.navigate('CreateBlog')}
-                />
-            </View>
+
 
             <View style={{ alignItems: 'center' }}>
-                <FlatList
-                    data={blogs}
-                    keyExtractor={(item) => item.id}
-                    renderItem={renderItem}
-                />
+
+                {
+                    blogs.map((item, index) => <BlogCard
+                        key={index}
+                        blogData={item}
+                        moveToBlogScreen={moveToBlogScreen}
+                        onModalOpen={onModalOpen}
+
+                    />)
+                }
             </View>
         </ScrollView>
     );
@@ -122,11 +160,36 @@ const styles = StyleSheet.create({
         marginHorizontal: 10,
         marginVertical: 10
     },
-    addIcon: {
-        position: 'absolute',
-        zIndex: 1,
-        right: 30,
+    headerBtnContainer: {
+
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-evenly'
+    },
+    createBtn: {
+        backgroundColor: 'purple',
+        paddingHorizontal: 20,
+        paddingVertical: 5
+    },
+    createText: {
+        fontSize: 20,
+        color: 'white'
+    },
+    logoutBtn: {
+
+        // backgroundColor: '#ff6666',
+        paddingHorizontal: 20,
+        paddingVertical: 5,
+        justifyContent: 'center',
+        alignItems: 'center'
+
+    },
+
+    logoutText: {
+        fontSize: 20,
+        color: 'blue'
     }
+
 });
 
 export default Home;

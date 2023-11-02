@@ -13,16 +13,14 @@ const globalStyles = StyleSheet.create({
     },
     headingText: {
         fontSize: 36,
-        fontFamily: 'Nunito-Black',
-        color: 'rgba(0,0,0,0.7)'
+        color: 'rgba(0,0,0,0.7)',
+        textAlign: 'center'
     },
     primaryText: {
         fontSize: 22,
-        fontFamily: 'Nunito-Bold',
     },
     secondaryText: {
         fontSize: 18,
-        fontFamily: 'Nunito-Regular',
         letterSpacing: 0.1,
     },
     primaryTouchableBtn: {
@@ -38,13 +36,11 @@ const globalStyles = StyleSheet.create({
         elevation: 5,
     },
     btnText: {
-        fontFamily: 'Nunito-SemiBold',
         fontSize: 18,
         color: 'white',
         textAlign: 'center'
     },
     largeBtnText: {
-        fontFamily: 'Nunito-Bold',
         fontSize: 22,
         color: 'white',
         textAlign: 'center'
@@ -62,7 +58,7 @@ const globalStyles = StyleSheet.create({
     },
 
     cancelBtn: {
-        backgroundColor: 'blue', // Change the background color for cancel button
+        backgroundColor: 'blue',
     },
 
 })

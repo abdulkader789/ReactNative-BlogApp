@@ -39,7 +39,6 @@ const styles = StyleSheet.create({
     },
     content: {
         fontSize: 18,
-        fontFamily: 'Nunito-Regular',
         letterSpacing: 0.1,
         flex: 1,
         flexWrap: 'wrap',
