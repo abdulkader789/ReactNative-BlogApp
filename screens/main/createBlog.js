@@ -9,7 +9,6 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 
 const CreateBlog = ({ navigation, route }) => {
-    // const { onUpdateSuccess } = route.params || {};
 
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
@@ -19,25 +18,7 @@ const CreateBlog = ({ navigation, route }) => {
     const currentUser = auth.currentUser;
     const uid = currentUser ? currentUser.uid : null;
 
-    // useEffect(() => {
-    //     if (id && uid) {
-    //         const blogDocRef = doc(collection(firestore, 'usersBlog', uid, 'blogs'), id);
-    //         const unsubscribe = onSnapshot(blogDocRef, (snapshot) => {
-    //             if (snapshot.exists()) {
-    //                 const data = snapshot.data();
-    //                 setTitle(data.title);
-    //                 setContent(data.content);
-    //                 setCoverImg(data.coverImage);
 
-    //             }
-    //         });
-
-    //         // Clean up the listener when the component unmounts
-    //         return () => {
-    //             unsubscribe();
-    //         };
-    //     }
-    // }, [id, uid]);
 
 
 
@@ -178,7 +159,6 @@ const CreateBlog = ({ navigation, route }) => {
             });
             getBlogData(id)
             console.warn("you updated your blog")
-            // onUpdateSuccess();
             navigation.navigate('Home');
 
         } catch (error) {

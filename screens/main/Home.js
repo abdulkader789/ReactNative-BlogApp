@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView, Modal, TouchableOpacity } from 'react-native';
-// import Ionicons from 'react-native-vector-icons/Ionicons';
 import { getDocs, collection } from 'firebase/firestore';
-// import { Ionicons } from '@expo/vector-icons';
 import { doc, deleteDoc } from 'firebase/firestore';
 
 import { auth, firestore, firebase } from '../../firebaseConfig';
@@ -19,9 +17,7 @@ const Home = ({ navigation }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedCardId, setSelectedCardId] = useState([]);
     const { setLoggedIn } = useContext(UserContext);
-    // const onUpdateSuccess = () => {
-    //     getBlogData();
-    // };
+
     const onLogout = async () => {
         const auth = getAuth();
         try {
@@ -83,7 +79,6 @@ const Home = ({ navigation }) => {
         setSelectedCardId(null);
         setModalOpen(false);
         getBlogData()
-        // onUpdateSuccess()
     }
     function onDeleteBlog() {
         setModalOpen(false);
@@ -92,7 +87,6 @@ const Home = ({ navigation }) => {
         deleteDoc(blogRef)
             .then(() => {
                 console.warn('Document successfully deleted!');
-                // onUpdateSuccess()
                 getBlogData()
             })
             .catch((error) => {

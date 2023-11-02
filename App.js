@@ -42,15 +42,7 @@ const App = () => {
     return () => unsubscribe();
   }, []);
 
-  // const handleLogout = async () => {
-  //   const auth = getAuth();
-  //   try {
-  //     await signOut(auth);
-  //     setLoggedIn(false);
-  //   } catch (error) {
-  //     console.error('Error signing out:', error);
-  //   }
-  // };
+
 
   if (loading) {
     return <ActivityIndicator size={32} color="gray" />
