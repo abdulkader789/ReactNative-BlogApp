@@ -8,7 +8,9 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 
-const CreateBlog = ({ navigation, route, onUpdateSuccess }) => {
+const CreateBlog = ({ navigation, route }) => {
+    // const { onUpdateSuccess } = route.params || {};
+
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [coverImg, setCoverImg] = useState(null);
@@ -17,24 +19,25 @@ const CreateBlog = ({ navigation, route, onUpdateSuccess }) => {
     const currentUser = auth.currentUser;
     const uid = currentUser ? currentUser.uid : null;
 
-    useEffect(() => {
-        if (id && uid) {
-            const blogDocRef = doc(collection(firestore, 'usersBlog', uid, 'blogs'), id);
-            const unsubscribe = onSnapshot(blogDocRef, (snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.data();
-                    setTitle(data.title);
-                    setContent(data.content);
-                    setCoverImg(data.coverImage);
-                }
-            });
+    // useEffect(() => {
+    //     if (id && uid) {
+    //         const blogDocRef = doc(collection(firestore, 'usersBlog', uid, 'blogs'), id);
+    //         const unsubscribe = onSnapshot(blogDocRef, (snapshot) => {
+    //             if (snapshot.exists()) {
+    //                 const data = snapshot.data();
+    //                 setTitle(data.title);
+    //                 setContent(data.content);
+    //                 setCoverImg(data.coverImage);
 
-            // Clean up the listener when the component unmounts
-            return () => {
-                unsubscribe();
-            };
-        }
-    }, [id, uid]);
+    //             }
+    //         });
+
+    //         // Clean up the listener when the component unmounts
+    //         return () => {
+    //             unsubscribe();
+    //         };
+    //     }
+    // }, [id, uid]);
 
 
 
@@ -59,6 +62,7 @@ const CreateBlog = ({ navigation, route, onUpdateSuccess }) => {
     function onCheck() {
         if (id) {
             onUpdate(id);
+
             return;
         }
         onCreate();
@@ -83,7 +87,7 @@ const CreateBlog = ({ navigation, route, onUpdateSuccess }) => {
         });
 
         // Return the unsubscribe function
-        return unsubscribe;
+        // return unsubscribe;
     }
 
 
@@ -134,7 +138,7 @@ const CreateBlog = ({ navigation, route, onUpdateSuccess }) => {
                 setContent('');
                 setCoverImg(null);
                 console.warn('succefully uploaded blog data')
-                onUpdateSuccess();
+                // onUpdateSuccess();
 
                 navigation.navigate('Home');
             } catch (error) {
@@ -174,8 +178,7 @@ const CreateBlog = ({ navigation, route, onUpdateSuccess }) => {
             });
             getBlogData(id)
             console.warn("you updated your blog")
-            onUpdateSuccess();
-
+            // onUpdateSuccess();
             navigation.navigate('Home');
 
         } catch (error) {
@@ -226,8 +229,6 @@ const CreateBlog = ({ navigation, route, onUpdateSuccess }) => {
                     <Text style={globalStyles.btnText}>Upload Blog</Text>
                 </TouchableOpacity>
             </View>
-
-
         </ScrollView>
     );
 };

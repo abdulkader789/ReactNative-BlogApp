@@ -55,23 +55,7 @@ const App = () => {
   if (loading) {
     return <ActivityIndicator size={32} color="gray" />
   }
-  // if (!loggedIn) {
-  //   return (
 
-  //     <AuthContext.Provider value={{ loggedIn, setLoggedIn }}>
-
-  //       <SafeAreaView style={{ flex: 1 }}>
-  //         <NavigationContainer>
-  //           <Tab.Navigator initialRouteName='Login'>
-
-  //             <Tab.Screen name="Login" component={Login} />
-  //             <Tab.Screen name="Register" component={Register} />
-  //           </Tab.Navigator>
-  //         </NavigationContainer>
-  //       </SafeAreaView>
-  //     </AuthContext.Provider>
-  //   )
-  // }
 
   return (
     <UserContext.Provider value={{ loggedIn, setLoggedIn }}>

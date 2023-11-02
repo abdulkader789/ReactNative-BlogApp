@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, FlatList, StyleSheet, ScrollView, Modal, Button, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Modal, TouchableOpacity } from 'react-native';
 // import Ionicons from 'react-native-vector-icons/Ionicons';
 import { getDocs, collection } from 'firebase/firestore';
 // import { Ionicons } from '@expo/vector-icons';
@@ -19,10 +19,9 @@ const Home = ({ navigation }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedCardId, setSelectedCardId] = useState([]);
     const { setLoggedIn } = useContext(UserContext);
-    const onUpdateSuccess = () => {
-        // Call the function to update the data in the homepage
-        getBlogData();
-    };
+    // const onUpdateSuccess = () => {
+    //     getBlogData();
+    // };
     const onLogout = async () => {
         const auth = getAuth();
         try {
@@ -83,7 +82,8 @@ const Home = ({ navigation }) => {
         navigation.navigate('CreateBlog', { id: selectedCardId });
         setSelectedCardId(null);
         setModalOpen(false);
-        getBlogData();
+        getBlogData()
+        // onUpdateSuccess()
     }
     function onDeleteBlog() {
         setModalOpen(false);
@@ -92,6 +92,7 @@ const Home = ({ navigation }) => {
         deleteDoc(blogRef)
             .then(() => {
                 console.warn('Document successfully deleted!');
+                // onUpdateSuccess()
                 getBlogData()
             })
             .catch((error) => {
@@ -118,15 +119,13 @@ const Home = ({ navigation }) => {
                 />
             </Modal>
             <View style={styles.headerBtnContainer}>
-                {/* <TouchableOpacity style={styles.createBtn} onPress={() => navigation.navigate('CreateBlog')}
+                <TouchableOpacity style={styles.createBtn} onPress={() => navigation.navigate('CreateBlog')}
                 >
                     <Text style={styles.createText}>Create Blog</Text>
 
-                </TouchableOpacity> */}
-
-                <TouchableOpacity style={styles.createBtn} onPress={() => navigation.navigate('CreateBlog', { onUpdateSuccess })}>
-                    <Text style={styles.createText}>Create Blog</Text>
                 </TouchableOpacity>
+
+
 
 
                 <TouchableOpacity style={styles.logoutBtn} onPress={onLogout}>
